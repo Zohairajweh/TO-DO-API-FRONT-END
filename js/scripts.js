@@ -1,20 +1,66 @@
+
 // Grab the index list of all todos.
+
 const allToDos = document.getElementById( 'index' );
+
 // If available, proceed.
+
 if ( allToDos )
-{ // Run Axios to obtain list.
-  axios.get( 'https://localhost:44301/api/ToDoItems/' )
+
+{ // Repeatable function for showing all of our to-dos.
+
+  const outputToDos = () => {
+
+    // Clear any existing items.
+
+    allToDos.innerHTML = '';
+
+    // Run Axios to obtain list.
+
+    axios.get( 'https://localhost:44301/api/ToDoItems/' )
+
     // Get just the data from the response.
+
     .then( response => response.data )
+
     // "Process" our data (JSON object or array.)
+
     .then( data => {
+
       // console.log( data );
+
       data.forEach( toDo => { // Output list of todos.
+
         const toDoLI = document.createElement( 'LI' );
-        toDoLI.textContent = toDo.task;
+
+        toDoLI.textContent = ' ' + toDo.task;
+
+        const toDoCheckbox = document.createElement( 'INPUT' );
+
+        toDoCheckbox.type = 'checkbox';
+
+        toDoCheckbox.addEventListener( 'click', event => {
+
+          axios.delete( 'https://localhost:44301/api/ToDoItems/' + toDo.id )
+
+            .then( response => { outputToDos(); } );
+
+        } );
+
+        toDoLI.prepend( toDoCheckbox );
+
         allToDos.appendChild( toDoLI );
+
       } );
+
     } );
+
+  }
+
+  // On pageload, output the todos!
+
+  outputToDos();
+
 }
 
 
@@ -37,15 +83,7 @@ if ( createToDo )
 
     const newTask = document.getElementById( 'task' ).value;
 
-    const newCompletedRaw = document.getElementById( 'completed' ).checked;
-
-    // Enforce boolean for completed.
-
-    let newCompleted = false;
-
-    if ( newCompletedRaw )
-
-      newCompleted = true;
+    const newCompleted = document.getElementById( 'completed' ).checked;
 
     // Create the new todo.
 
